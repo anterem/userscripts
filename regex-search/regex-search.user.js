@@ -2,7 +2,7 @@
 // @name         Regex Search
 // @namespace    https://github.com/anterem/userscripts
 // @match        *://*/*
-// @version      2.4
+// @version      2.5
 // @description  Search and highlight regex matches on webpage. Uses CSS Custom Highlight API.
 // @run-at       context-menu
 // @grant        GM.setValue
@@ -43,14 +43,19 @@
     <style>
       :host { all: initial; --font-sans: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;  }
       #popup { width:300px; background:white; border:3px solid black; }
-      #drag { height:0.4rem; background:black; cursor:move; }
+      #top { display:flex; align-items:flex-start; }
+      #drag { flex:1 1 auto; height:0.4rem; background:black; cursor:move; }
       #content { padding:0.6rem 0.6rem 0.3rem; }
       #match-count { margin-left:0.3rem; font:600 0.9rem var(--font-sans); }
       textarea { width:100%; margin-bottom:0.3rem; font:600 1rem monospace; border:3px solid black; resize:vertical; box-sizing:border-box; }
-      button { padding:0.2rem 0.4rem; color:white; background:black; font:600 0.8rem var(--font-sans); border:none; }
+      button { padding:0.2rem 0.6rem; color:white; background:black; font:600 0.8rem var(--font-sans); border:none; }
+      #popup { position:relative; }
     </style>
     <div id="popup">
-      <div id="drag"></div>
+      <div id="top">
+        <div id="drag"></div>
+        <button id="close">✖</button>
+      </div>
       <div id="content">
         <textarea id="input" placeholder="Enter regex patterns (one per line)" rows="3" maxlength="500" spellcheck="false"></textarea>
         <button id="search">Search</button>
@@ -95,11 +100,12 @@
     );
 
     const elById = (id) => shadow.getElementById(id);
-    const [input, searchBtn, prevBtn, nextBtn, countEl] = [
+    const [input, searchBtn, prevBtn, nextBtn, closeBtn, countEl] = [
         "input",
         "search",
         "prev",
         "next",
+        "close",
         "match-count",
     ].map(elById);
 
@@ -233,4 +239,8 @@
     searchBtn.onclick = search;
     nextBtn.onclick = () => step(1);
     prevBtn.onclick = () => step(-1);
+    closeBtn.onclick = () => {
+        container.remove();
+        window.__regexSearch_popup__ = null;
+    };
 })();
